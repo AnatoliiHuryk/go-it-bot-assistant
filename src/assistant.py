@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from src.record import Record
 from src.fields import Name, Phone, Address, Email, Birthday
 from src.exceptions import RecordPropertyNotFound
@@ -13,7 +13,7 @@ class Assistant:
         return False
     
     def phone_exists(self, phone: str) -> bool:
-        return any([[str(rec_phone) == phone for rec_phone in rec.phones] for rec in self._records.values()])
+        return any(str(p) == phone for rec in self._records.values() for p in rec.phones)
     
     def add_record(self, name: Name, phone: Phone, email: Email = None, address: Address = None, birthday: Birthday = None) -> None:
         self._records[str(name)] = Record(name, phone, email, address, birthday)
@@ -46,3 +46,6 @@ class Assistant:
 
     def get_record(self, name: str) -> Record:
         return self._records.get(name)
+    
+    def get_records(self) -> List[Record]:
+        return self._records.values()
