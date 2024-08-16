@@ -7,6 +7,8 @@ from typing import Callable
 from src.assistant import Assistant
 from src.fields import Name, Phone, Address, Email, Birthday
 
+from prettytable import PrettyTable
+
 class HandlerResponse:
     class Status(Enum):
         CONTINUE = 1
@@ -144,7 +146,27 @@ class ShowAllRecordsCommandHandler(BaseCommandHandler):
 
 class SearchRecordCommandHandler(BaseCommandHandler):
     def handle_input(self) -> HandlerResponse:
-        pass
+        try:
+            search = input('Enter name to search for: ')
+            record = self._data.get_record(search)
+
+            table = PrettyTable()
+            table.field_names = ["Name", "Phones", "Email", "Address", "Birtday"]
+            
+            if record:
+                filled_row = [
+                    record.name,
+                    "\n".join(str(phone) if str(phone) else '-' for phone in record.phones),
+                    record.email or '-',
+                    record.address or '-',
+                    str(record.birthday) or '-'
+                ]
+                table.add_row(filled_row)
+
+            print(table)
+            return HandlerResponse(HandlerResponse.Status.CONTINUE)
+        except Exception as e:
+            return HandlerResponse(HandlerResponse.Status.CONTINUE, e)
 
 class UnknownRecordCommandHandler(BaseCommandHandler):
     """Handler for catching invalid input commands."""
